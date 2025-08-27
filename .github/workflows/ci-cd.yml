@@ -32,11 +32,11 @@ jobs:
     - name: Deploy to server via SSH
       uses: appleboy/ssh-action@v0.1.7
       with:
-        host: ${{ secrets.20.107.201.103 }}        # e.g., 20.127.201.103
-        username: ${{ secrets.dpd }}  # e.g., dpd
+        host: ${{ secrets.SERVER_IP }}        # e.g., 20.127.201.103
+        username: ${{ secrets.SERVER_USER }}  # e.g., dpd
         key: ${{ secrets.SERVER_SSH_KEY }}    # private SSH key (must be added in GitHub Secrets)
-        port: ${{ secrets.22 }}      # e.g., 22
-        timeout: 60s                           # Increase timeout if needed
+        port: ${{ secrets.SERVER_PORT }}      # e.g., 22
+        timeout: 60s                          # Increase timeout if needed
         script: |
           # Go to project directory
           cd /home/dpd/Devora_API.0
