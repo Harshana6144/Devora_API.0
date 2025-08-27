@@ -1,0 +1,47 @@
+name: CI/CD FastAPI
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests (optional)
+      run: |
+        # add your test command here if any
+        echo "Tests passed!"
+
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          cd /home/dpd/Devora_API.0
+          source venv/bin/activate
+          git pull origin main
+          pip install -r requirements.txt
+          pm2 restart Devora_API || pm2 start venv/bin/uvicorn --name Devora_API --interpreter python3 -- api:app --host 0.0.0.0 --port 8000
+          pm2 save
