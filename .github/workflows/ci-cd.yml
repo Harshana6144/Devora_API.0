@@ -3,7 +3,7 @@ name: CI/CD FastAPI
 on:
   push:
     branches:
-      - main  # Trigger on push to main
+      - main
   pull_request:
     branches:
       - main
@@ -28,16 +28,15 @@ jobs:
 
     - name: Run tests (optional)
       run: |
-        # add your test command here if any
         echo "Tests passed!"
 
     - name: Deploy to server
       uses: appleboy/ssh-action@v0.1.7
       with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USER }}
+        host: ${{ secrets.SERVER_IP }}        # e.g., 20.205.22.95
+        username: ${{ secrets.SERVER_USER }}  # e.g., dpd
         key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT }}
+        port: ${{ secrets.SERVER_PORT }}      # usually 22
         script: |
           cd /home/dpd/Devora_API.0
           source venv/bin/activate
@@ -45,3 +44,4 @@ jobs:
           pip install -r requirements.txt
           pm2 restart Devora_API || pm2 start venv/bin/uvicorn --name Devora_API --interpreter python3 -- api:app --host 0.0.0.0 --port 8000
           pm2 save
+          sudo systemctl restart nginx
