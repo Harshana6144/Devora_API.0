@@ -27,32 +27,32 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run tests (optional)
-      run: |
-        echo "Tests passed!"
+      run: echo "Tests passed!"
 
     - name: Deploy to server via SSH
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: ${{ secrets.SERVER_IP }}        # 20.127.201.103
         username: ${{ secrets.SERVER_USER }}  # dpd
-        key: ${{ secrets.SERVER_SSH_KEY }}    
-        port: ${{ secrets.SERVER_PORT }}      
+        key: ${{ secrets.SERVER_SSH_KEY }}    # Private key stored in GitHub Secret
+        port: ${{ secrets.SERVER_PORT }}      # Usually 22
+        timeout: 60s                           # Increase timeout if needed
         script: |
           # Go to project directory
           cd /home/dpd/Devora_API.0
-          
+
           # Activate virtual environment
           source venv/bin/activate
-          
+
           # Pull latest code
           git pull origin main
-          
+
           # Install dependencies
           pip install -r requirements.txt
-          
+
           # Restart FastAPI app via PM2
           pm2 restart Devora_API || pm2 start venv/bin/uvicorn --name Devora_API --interpreter python3 -- api:app --host 0.0.0.0 --port 8000
           pm2 save
-          
-          # Restart Nginx (requires passwordless sudo for dpd)
+
+          # Restart Nginx
           sudo systemctl restart nginx
