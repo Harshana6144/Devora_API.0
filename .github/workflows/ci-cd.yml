@@ -36,7 +36,7 @@ jobs:
         username: ${{ secrets.SERVER_USER }}  # dpd
         key: ${{ secrets.SERVER_SSH_KEY }}    # Private key stored in GitHub Secret
         port: ${{ secrets.SERVER_PORT }}      # Usually 22
-        timeout: 60s                           # Increase timeout if needed
+        timeout: 60s
         script: |
           # Go to project directory
           cd /home/dpd/Devora_API.0
@@ -53,6 +53,3 @@ jobs:
           # Restart FastAPI app via PM2
           pm2 restart Devora_API || pm2 start venv/bin/uvicorn --name Devora_API --interpreter python3 -- api:app --host 0.0.0.0 --port 8000
           pm2 save
-
-          # Restart Nginx
-          sudo systemctl restart nginx
